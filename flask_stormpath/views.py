@@ -9,6 +9,8 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
+    url_for,
 )
 from flask_login import login_user
 from six import string_types
@@ -16,12 +18,17 @@ from stormpath.resources.provider import Provider
 
 from . import StormpathError, logout_user
 from .forms import (
+    AcceptTermsRegistrationForm,
     ChangePasswordForm,
+    ChangePasswordFormHref,
     ForgotPasswordForm,
     LoginForm,
     RegistrationForm,
+    ResendVerificationForm,
 )
 from .models import User
+
+from wtforms import Label
 
 
 def register():
@@ -35,7 +42,12 @@ def register():
     template that is used to render this page can all be controlled via
     Flask-Stormpath settings.
     """
-    form = RegistrationForm()
+    form = AcceptTermsRegistrationForm()
+    # TODO: The acceptance label text and link should probably become a config value of some sort.
+    form.accept.label = Label(form.accept.id,
+                              'I accept the <a href="{}" data-rel="dialog">terms and conditions</a> '
+                              'for using the bulletin board.'.format(url_for('public.terms'))
+                              )
 
     # If we received a POST request with valid information, we'll continue
     # processing.
@@ -46,6 +58,8 @@ def register():
         # flashing error messages if required.
         data = form.data
         for field in data.keys():
+            if field == 'accept':
+                continue
             if current_app.config['STORMPATH_ENABLE_%s' % field.upper()]:
                 if current_app.config['STORMPATH_REQUIRE_%s' % field.upper()] and not data[field]:
                     fail = True
@@ -73,9 +87,16 @@ def register():
                 data['given_name'] = data['given_name'] or 'Anonymous'
                 data['surname'] = data['surname'] or 'Anonymous'
 
+                del data['accept']  # TODO: Add a custom Stormpath user field to store acceptance?
+
                 # Create the user account on Stormpath.  If this fails, an
                 # exception will be raised.
                 account = User.create(**data)
+                if account.is_unverified():
+                    # Don't log in if the account has not been verified yet.
+                    return redirect(
+                        current_app.config['STORMPATH_WELCOME_URL']
+                    )
 
                 # If we're able to successfully create the user's account,
                 # we'll log the user in (creating a secure session using
@@ -92,7 +113,7 @@ def register():
                 return redirect(redirect_url)
 
             except StormpathError as err:
-                flash(err.message)
+                flash(err.message.get('message'))
 
     return render_template(
         current_app.config['STORMPATH_REGISTRATION_TEMPLATE'],
@@ -130,7 +151,26 @@ def login():
             return redirect(request.args.get('next') or current_app.config['STORMPATH_REDIRECT_URL'])
 
         except StormpathError as err:
-            flash(err.message)
+
+            if err.message.get('code') == 7102:
+                # User's email has not been verified yet
+                session['verify_email_for'] = form.login.data
+
+                return redirect(
+                    current_app.config['STORMPATH_VERIFY_EMAIL_URL']
+                )
+            else:
+                flash(err.message.get('message'))
+
+    # Fill in the username if it is available.
+    href = request.args.get('href')
+    if href:
+        try:
+            account = current_app.stormpath_manager.client.accounts.get(href)
+            form.login.data = account.username
+
+        except StormpathError as err:
+            flash(err.message.get('message'))
 
     return render_template(
         current_app.config['STORMPATH_LOGIN_TEMPLATE'],
@@ -195,18 +235,22 @@ def forgot_change():
     The URL this view is bound to, and the template that is used to render
     this page can all be controlled via Flask-Stormpath settings.
     """
-    try:
-        account = current_app.stormpath_manager.application.verify_password_reset_token(request.args.get('sptoken'))
-    except StormpathError as err:
-        abort(400)
 
-    form = ChangePasswordForm()
+    form = ChangePasswordFormHref()
+
+    if request.method == 'GET':
+        try:
+            account = current_app.stormpath_manager.application.verify_password_reset_token(request.args.get('sptoken'))
+            form.href.data = account.href
+        except StormpathError:
+            abort(400)
 
     # If we received a POST request with valid information, we'll continue
     # processing.
     if form.validate_on_submit():
         try:
             # Update this user's passsword.
+            account = current_app.stormpath_manager.client.accounts.get(form.href.data)
             account.password = form.password.data
             account.save()
 
@@ -408,3 +452,40 @@ def logout():
    """
     logout_user()
     return redirect('/')
+
+
+def welcome():
+    return render_template(current_app.config['STORMPATH_WELCOME_TEMPLATE'])
+
+
+def verify_email():
+    form = ResendVerificationForm()
+
+    if form.validate_on_submit():
+        try:
+            account = current_app.stormpath_manager.application.accounts.search({'username': form.username.data})[0]
+            current_app.stormpath_manager.application.verification_emails.resend(account, account.directory)
+
+            return render_template(
+                current_app.config['STORMPATH_VERIFY_EMAIL_SENT']
+            )
+        except StormpathError as err:
+            flash(err.message.get('message'))
+
+    form.username.data = session['verify_email_for']
+    return render_template(
+        current_app.config['STORMPATH_VERIFY_EMAIL_TEMPLATE'],
+        form=form
+    )
+
+
+def verify_email_tokens():
+    try:
+        account = current_app.stormpath_manager.client.accounts.verify_email_token(request.args.get('sptoken'))
+
+        return render_template(
+            current_app.config['STORMPATH_VERIFY_EMAIL_COMPLETE_TEMPLATE'], href=account.href
+        )
+
+    except StormpathError as err:
+        flash(err.message.get('message'))

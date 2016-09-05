@@ -60,6 +60,8 @@ def init_settings(config):
     # Configure URL mappings.  These URL mappings control which URLs will be
     # used by Flask-Stormpath views.
     config.setdefault('STORMPATH_REGISTRATION_URL', '/register')
+    config.setdefault('STORMPATH_VERIFY_EMAIL_URL', '/verify_email')
+    config.setdefault('STORMPATH_WELCOME_URL', '/welcome')
     config.setdefault('STORMPATH_LOGIN_URL', '/login')
     config.setdefault('STORMPATH_LOGOUT_URL', '/logout')
     config.setdefault('STORMPATH_FORGOT_PASSWORD_URL', '/forgot')
@@ -78,6 +80,10 @@ def init_settings(config):
     # used to render the Flask-Stormpath views.
     config.setdefault('STORMPATH_BASE_TEMPLATE', 'flask_stormpath/base.html')
     config.setdefault('STORMPATH_REGISTRATION_TEMPLATE', 'flask_stormpath/register.html')
+    config.setdefault('STORMPATH_VERIFY_EMAIL_TEMPLATE', 'flask_stormpath/verify_email.html')
+    config.setdefault('STORMPATH_VERIFY_EMAIL_SENT_TEMPLATE', 'flask_stormpath/verify_email_sent.html')
+    config.setdefault('STORMPATH_VERIFY_EMAIL_COMPLETE_TEMPLATE', 'flask_stormpath/verify_email_complete.html')
+    config.setdefault('STORMPATH_WELCOME_TEMPLATE', 'flask_stormpath/welcome.html')
     config.setdefault('STORMPATH_LOGIN_TEMPLATE', 'flask_stormpath/login.html')
     config.setdefault('STORMPATH_FORGOT_PASSWORD_TEMPLATE', 'flask_stormpath/forgot.html')
     config.setdefault('STORMPATH_FORGOT_PASSWORD_EMAIL_SENT_TEMPLATE', 'flask_stormpath/forgot_email_sent.html')

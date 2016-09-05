@@ -2,7 +2,7 @@
 
 
 from flask_wtf import Form
-from wtforms.fields import PasswordField, StringField
+from wtforms.fields import BooleanField, HiddenField, PasswordField, StringField
 from wtforms.validators import InputRequired, ValidationError
 
 
@@ -29,6 +29,10 @@ class RegistrationForm(Form):
     surname = StringField('Last Name')
     email = StringField('Email', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
+
+
+class AcceptTermsRegistrationForm(RegistrationForm):
+    accept = BooleanField()
 
 
 class LoginForm(Form):
@@ -80,3 +84,9 @@ class ChangePasswordForm(Form):
         """
         if self.password.data != field.data:
             raise ValidationError("Passwords don't match.")
+
+class ChangePasswordFormHref(ChangePasswordForm):
+    href = HiddenField('Href')
+
+class ResendVerificationForm(Form):
+    username = HiddenField('Username')
