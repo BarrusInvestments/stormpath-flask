@@ -6,6 +6,11 @@ Change Log
 
 All library changes, in descending order.
 
+UNRELEASED
+----------
+
+- Add email verification implementation.
+
 
 Version 0.4.8
 -------------

@@ -285,6 +285,35 @@ class TestLogin(StormpathTestCase):
             self.assertTrue('redirect_for_login' in location)
             self.assertFalse('redirect_for_registration' in location)
 
+    def test_redirect_to_verify_email_url(self):
+        # Enable email verification
+        self.app.config['STORMPATH_VERIFY_EMAIL'] = True
+        account_creation_policy = self.client.directories.search(self.application.name).items[0].account_creation_policy
+        account_creation_policy.verification_email_status = 'ENABLED'
+        # account_creation_policy.verification_success_email_status = 'ENABLED'
+        account_creation_policy.save()
+
+        # Create a user.
+        with self.app.app_context():
+            User.create(
+                username = 'rdegges',
+                given_name = 'Randall',
+                surname = 'Degges',
+                email = 'r@testmail.stormpath.com',
+                password = 'woot1LoveCookies!',
+            )
+
+
+        with self.app.test_client() as c:
+            # Attempt a login using username and password.
+            resp = c.post(
+                '/login',
+                data={'login': 'rdegges', 'password': 'woot1LoveCookies!',})
+
+            self.assertEqual(resp.status_code, 302)
+            location = resp.headers.get('location')
+            self.assertTrue('verify_email' in location)
+
 
 class TestLogout(StormpathTestCase):
     """Test our logout view."""

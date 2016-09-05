@@ -58,6 +58,9 @@ from .views import (
     login,
     logout,
     register,
+    verify_email,
+    verify_email_tokens,
+    welcome,
 )
 
 
@@ -207,6 +210,26 @@ class StormpathManager(object):
                 app.config['STORMPATH_FACEBOOK_LOGIN_URL'],
                 'stormpath.facebook_login',
                 facebook_login,
+            )
+
+        if app.config['STORMPATH_VERIFY_EMAIL']:
+            app.add_url_rule(
+                app.config['STORMPATH_VERIFY_EMAIL_URL'],
+                'stormpath.verify_email',
+                verify_email,
+                methods=['GET', 'POST'],
+            )
+
+            app.add_url_rule(
+                '/emailVerificationTokens',
+                'stormpath.verify_email_tokens',
+                verify_email_tokens,
+            )
+
+            app.add_url_rule(
+                app.config['STORMPATH_WELCOME_URL'],
+                'stormpath.welcome',
+                welcome,
             )
 
     @property

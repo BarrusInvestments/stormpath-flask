@@ -1,0 +1,44 @@
+{% extends config['STORMPATH_BASE_TEMPLATE'] %}
+
+{% block title %}Email Verified!{% endblock %}
+{% block description %}Email verification completed!{% endblock %}
+{% block bodytag %}login{% endblock %}
+
+{% block body %}
+  <script type="text/javascript" nonce="{{ csrf_token() }}">
+    document.addEventListener("DOMContentLoaded", function(event) { 
+      setTimeout(function () {
+        window.location.href = "{{ config['STORMPATH_LOGIN_URL'] }}?href={{ href | safe }}"
+      }, 5000)
+    })
+  </script>
+  <div class="container custom-container">
+    <div class="va-wrapper">
+      <div class="view login-view container">
+        <div class="box row">
+          <div class="email-password-area col-xs-12 large col-sm-12">
+            <div class="header">
+              <span>Email Verification Complete!</span>
+            </div>
+            <p>
+              Your email has been verified, you should be redirected back to
+              the <a href="{{ url_for('stormpath.login') }}"> login </a> page in 5 seconds...
+            </p>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="alert alert-danger bad-login">
+                  {% for message in messages %}
+                    {{ message }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+          </div>
+        </div>
+        {% if config['STORMPATH_ENABLE_LOGIN'] %}
+          <a class="forgot" href="{{ url_for('stormpath.login') }}">Back to Log In</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
