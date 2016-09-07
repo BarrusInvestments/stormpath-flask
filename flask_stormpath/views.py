@@ -112,7 +112,7 @@ def register():
                 return redirect(redirect_url)
 
             except StormpathError as err:
-                flash(err.message.get('message'))
+                flash(err.message)
 
     return render_template(
         current_app.config['STORMPATH_REGISTRATION_TEMPLATE'],
@@ -151,7 +151,7 @@ def login():
 
         except StormpathError as err:
 
-            if err.message.get('code') == 7102:
+            if err.message.code == 7102:
                 # User's email has not been verified yet
                 session['verify_email_for'] = form.login.data
 
@@ -159,7 +159,7 @@ def login():
                     current_app.config['STORMPATH_VERIFY_EMAIL_URL']
                 )
             else:
-                flash(err.message.get('message'))
+                flash(err.message)
 
     # Fill in the username if it is available.
     href = request.args.get('href')
@@ -169,7 +169,7 @@ def login():
             form.login.data = account.username
 
         except StormpathError as err:
-            flash(err.message.get('message'))
+            flash(err.message)
 
     return render_template(
         current_app.config['STORMPATH_LOGIN_TEMPLATE'],
@@ -469,7 +469,7 @@ def verify_email():
                 current_app.config['STORMPATH_VERIFY_EMAIL_SENT']
             )
         except StormpathError as err:
-            flash(err.message.get('message'))
+            flash(err.message)
 
     form.username.data = session['verify_email_for']
     return render_template(
@@ -487,4 +487,4 @@ def verify_email_tokens():
         )
 
     except StormpathError as err:
-        flash(err.message.get('message'))
+        flash(err.message)
