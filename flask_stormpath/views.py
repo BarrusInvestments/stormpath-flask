@@ -1,5 +1,6 @@
 """Our pluggable views."""
 
+import sys
 
 from facebook import get_user_from_cookie
 from flask import (
@@ -104,10 +105,8 @@ def register():
                 # STORMPATH_REDIRECT_URL setting.
                 login_user(account, remember=True)
 
-                if 'STORMPATH_REGISTRATION_REDIRECT_URL'\
-                        in current_app.config:
-                    redirect_url = current_app.config[
-                        'STORMPATH_REGISTRATION_REDIRECT_URL']
+                if 'STORMPATH_REGISTRATION_REDIRECT_URL' in current_app.config:
+                    redirect_url = current_app.config['STORMPATH_REGISTRATION_REDIRECT_URL']
                 else:
                     redirect_url = current_app.config['STORMPATH_REDIRECT_URL']
                 return redirect(redirect_url)

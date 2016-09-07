@@ -7,6 +7,24 @@ Change Log
 All library changes, in descending order.
 
 
+Version 0.4.6
+-------------
+
+**Released on September 6, 2016.**
+
+- Raising a clear error message when Flask-Stormpath fails to find the Stormpath
+  Application. This makes the debugging experience simpler for new developers.
+- Replacing deprecated ``from flask.ext.xxx`` import syntax to work with new
+  Flask release.
+- Making error strings UTF-8.
+- Handling errors in templates in a better way.
+- Adding Python 3 support.
+- Upgrading Stormpath dependency to latest release.
+- Upgrading oauth2client dependency to latest release.
+- Upgrading blinker dependency to latest release.
+- Upgrading Flask-Login dependency to latest release.
+
+
 Version 0.4.5
 -------------
 

@@ -15,7 +15,7 @@
 """
 
 
-__version__ = '0.4.5'
+__version__ = '0.4.6'
 __version_info__ = __version__.split('.')
 __author__ = 'Stormpath, Inc.'
 __license__ = 'Apache'
@@ -293,8 +293,7 @@ class StormpathManager(object):
                     self.app.config['STORMPATH_APPLICATION']
                 )
                 if applications is None:
-                    raise Exception('failed to find ' +  self.app.config['STORMPATH_APPLICATION'] + ' application. please add it in the '
-                                                                                                    'stormpath console')
+                    raise Exception('Failed to find ' + self.app.config['STORMPATH_APPLICATION'] + ' application. Please add it in the Stormpath console.')
 
                 ctx.stormpath_application = applications[0]
 

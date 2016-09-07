@@ -13,10 +13,7 @@ Documentation on RTFD: http://flask-stormpath.readthedocs.org/en/latest/
 from multiprocessing import cpu_count
 from subprocess import call
 
-from setuptools import (
-    Command,
-    setup,
-)
+from setuptools import Command, setup
 
 
 class RunTests(Command):
@@ -38,7 +35,7 @@ class RunTests(Command):
 
 setup(
     name = 'Flask-Stormpath',
-    version = '0.4.5',
+    version = '0.4.6',
     url = 'https://github.com/stormpath/stormpath-flask',
     license = 'Apache',
     author = 'Stormpath, Inc.',
@@ -52,13 +49,16 @@ setup(
     platforms = 'any',
     install_requires = [
         'Flask>=0.9.0',
-        'Flask-Login==0.2.9',
+        'Flask-Login==0.3.2',
         'Flask-WTF>=0.9.5',
-        'facebook-sdk==1.0.0',
-        'oauth2client==1.2',
-        'stormpath==2.1.1',
-        'blinker==1.3'
+        'facebook-sdk==2.0.0',
+        'oauth2client==1.5.2',
+        'stormpath==2.4.4',
+        'blinker==1.4'
     ],
+    extras_require = {
+        'test': ['coverage', 'pytest', 'pytest-cov', 'python-coveralls', 'Sphinx', 'pytest-xdist'],
+    },
     dependency_links=[
         'git+git://github.com/pythonforfacebook/facebook-sdk.git@e65d06158e48388b3932563f1483ca77065951b3#egg=facebook-sdk-1.0.0-alpha',
     ],
@@ -73,5 +73,12 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Session',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
     ],
 )
