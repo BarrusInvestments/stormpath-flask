@@ -151,7 +151,7 @@ def login():
 
         except StormpathError as err:
 
-            if err.message.code == 7102:
+            if err.code == 7102:
                 # User's email has not been verified yet
                 session['verify_email_for'] = form.login.data
 
