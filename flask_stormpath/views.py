@@ -44,11 +44,7 @@ def register():
     Flask-Stormpath settings.
     """
     form = AcceptTermsRegistrationForm()
-    # TODO: The acceptance label text and link should probably become a config value of some sort.
-    form.accept.label = Label(form.accept.id,
-                              'I accept the <a href="{}" data-rel="dialog">terms and conditions</a> '
-                              'for using the bulletin board.'.format(url_for('public.terms'))
-                              )
+    form.accept.label = Label(form.accept.id, '')
 
     # If we received a POST request with valid information, we'll continue
     # processing.
