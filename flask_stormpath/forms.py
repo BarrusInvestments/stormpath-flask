@@ -36,17 +36,18 @@ class RegistrationForm(Form):
         super(RegistrationForm, self).__init__(formdata, obj, prefix, csrf_context, secret_key, csrf_enabled, *args,
                                                **kwargs)
 
-        if config['STORMPATH_REQUIRE_USERNAME'] is True:
-            self.username.validators.append(InputRequired('Username is required.'))
+        if config:
+            if config['STORMPATH_ENABLE_USERNAME'] and config['STORMPATH_REQUIRE_USERNAME']:
+                self.username.validators.append(InputRequired('Username is required.'))
 
-        if config['STORMPATH_REQUIRE_GIVEN_NAME'] is True:
-            self.given_name.validators.append(InputRequired('First name is required.'))
+            if config['STORMPATH_ENABLE_GIVEN_NAME'] and config['STORMPATH_REQUIRE_GIVEN_NAME']:
+                self.given_name.validators.append(InputRequired('First name is required.'))
 
-        if config['STORMPATH_REQUIRE_MIDDLE_NAME'] is True:
-            self.middle_name.validators.append(InputRequired('Middle name is required.'))
+            if config['STORMPATH_ENABLE_MIDDLE_NAME'] and config['STORMPATH_REQUIRE_MIDDLE_NAME']:
+                self.middle_name.validators.append(InputRequired('Middle name is required.'))
 
-        if config['STORMPATH_REQUIRE_SURNAME'] is True:
-            self.surname.validators.append(InputRequired('Surname is required.'))
+            if config['STORMPATH_ENABLE_SURNAME'] and config['STORMPATH_REQUIRE_SURNAME']:
+                self.surname.validators.append(InputRequired('Surname is required.'))
 
 
 class AcceptTermsRegistrationForm(RegistrationForm):

@@ -49,18 +49,15 @@ def register():
     # If we received a POST request with valid information, we'll continue
     # processing.
     if form.validate_on_submit():
-        # Attempt to create the user's account on Stormpath.
         data = form.data
+        # Attempt to create the user's account on Stormpath.
         try:
-
             # Since Stormpath requires both the given_name and surname
             # fields be set, we'll just set the both to 'Anonymous' if
             # the user has # explicitly said they don't want to collect
             # those fields.
             data['given_name'] = data['given_name'] or 'Anonymous'
             data['surname'] = data['surname'] or 'Anonymous'
-
-            del data['accept']  # TODO: Add a custom Stormpath user field to store acceptance?
 
             # Create the user account on Stormpath.  If this fails, an
             # exception will be raised.
@@ -76,6 +73,10 @@ def register():
             # Flask-Login), then redirect the user to the
             # STORMPATH_REDIRECT_URL setting.
             login_user(account, remember=True)
+
+            # The email address must be verified, so pop an alert about it.
+            if current_app.config['STORMPATH_VERIFY_EMAIL'] is True:
+                flash('You must validate your email address before logging in. Please check your email for instructions.')
 
             if 'STORMPATH_REGISTRATION_REDIRECT_URL' in current_app.config:
                 redirect_url = current_app.config['STORMPATH_REGISTRATION_REDIRECT_URL']
