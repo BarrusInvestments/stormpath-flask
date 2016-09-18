@@ -37,20 +37,20 @@ class RegistrationForm(Form):
                                                **kwargs)
 
         if config['STORMPATH_REQUIRE_USERNAME'] is True:
-            self.username.validators.append(InputRequired())
+            self.username.validators.append(InputRequired('Username is required.'))
 
         if config['STORMPATH_REQUIRE_GIVEN_NAME'] is True:
-            self.given_name.validators.append(InputRequired())
+            self.given_name.validators.append(InputRequired('First name is required.'))
 
         if config['STORMPATH_REQUIRE_MIDDLE_NAME'] is True:
-            self.middle_name.validators.append(InputRequired())
+            self.middle_name.validators.append(InputRequired('Middle name is required.'))
 
         if config['STORMPATH_REQUIRE_SURNAME'] is True:
-            self.surname.validators.append(InputRequired())
+            self.surname.validators.append(InputRequired('Surname is required.'))
 
 
 class AcceptTermsRegistrationForm(RegistrationForm):
-    accept = BooleanField()
+    accept = BooleanField(validators=[InputRequired('You have to accept the terms and conditions in order to use the bulletin board.')])
 
 
 class LoginForm(Form):
