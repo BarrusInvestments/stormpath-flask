@@ -75,7 +75,7 @@ class LoginForm(Form):
         Javascript) we don't need to have a form for logging in users that way.
     """
     login = StringField('Login', validators=[InputRequired('Login identifier required.')])
-    password = PasswordField('Password', validators=[InputRequired('Password required')])
+    password = PasswordField('Password', validators=[InputRequired('Password required.')])
 
 
 class ForgotPasswordForm(Form):
