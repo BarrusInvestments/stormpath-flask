@@ -43,7 +43,7 @@ def register():
     template that is used to render this page can all be controlled via
     Flask-Stormpath settings.
     """
-    form = AcceptTermsRegistrationForm()
+    form = AcceptTermsRegistrationForm(config=current_app.config)
     form.accept.label = Label(form.accept.id, '')
 
     # If we received a POST request with valid information, we'll continue
