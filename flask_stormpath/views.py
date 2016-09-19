@@ -58,6 +58,7 @@ def register():
             # those fields.
             data['given_name'] = data['given_name'] or 'Anonymous'
             data['surname'] = data['surname'] or 'Anonymous'
+            del data['accept'] # Remove custom form input.
 
             # Create the user account on Stormpath.  If this fails, an
             # exception will be raised.
