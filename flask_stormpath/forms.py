@@ -101,7 +101,7 @@ class ChangePasswordForm(Form):
     password = PasswordField('Password', validators=[InputRequired('Password required.')])
     password_again = PasswordField('Password (again)', validators=[
         InputRequired('Please verify the password.'),
-        EqualTo(password, 'Passwords don\'t match.')
+        EqualTo('password', 'Passwords do not match.')
     ])
 
 class ChangePasswordFormHref(ChangePasswordForm):
