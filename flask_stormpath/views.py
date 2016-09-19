@@ -76,7 +76,7 @@ def register():
             login_user(account, remember=True)
 
             # The email address must be verified, so pop an alert about it.
-            if current_app.config['STORMPATH_VERIFY_EMAIL'] is True:
+            if account.is_unverified() and current_app.config['STORMPATH_VERIFY_EMAIL'] is True:
                 flash('You must validate your email address before logging in. Please check your email for instructions.')
 
             if 'STORMPATH_REGISTRATION_REDIRECT_URL' in current_app.config:
