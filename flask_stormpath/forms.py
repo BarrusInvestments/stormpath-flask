@@ -35,9 +35,9 @@ class RegistrationForm(Form):
     password = PasswordField('Password', validators=[InputRequired('You must supply a password.')])
 
     def __init__(self, formdata=_Auto, obj=None, prefix='', csrf_context=None, secret_key=None, csrf_enabled=None,
-                 config=None, *args, **kwargs):
-        super(RegistrationForm, self).__init__(formdata, obj, prefix, csrf_context, secret_key, csrf_enabled, *args,
-                                               **kwargs)
+                 config=None, **kwargs):
+        super(RegistrationForm, self).__init__(formdata=formdata, obj=obj, prefix=prefix, csrf_context=csrf_context,
+                                               secret_key=secret_key, csrf_enabled=csrf_enabled, **kwargs)
 
         if config:
             if config['STORMPATH_ENABLE_USERNAME'] and config['STORMPATH_REQUIRE_USERNAME']:
