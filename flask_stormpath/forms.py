@@ -34,7 +34,7 @@ class RegistrationForm(FlaskForm):
     ])
     password = PasswordField('Password', validators=[InputRequired('You must supply a password.')])
 
-    def __init__(self, formdata=_Auto, **kwargs):
+    def __init__(self, formdata=_Auto, config=None **kwargs):
         super(RegistrationForm, self).__init__(formdata=formdata, **kwargs)
 
         if config:
