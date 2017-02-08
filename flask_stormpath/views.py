@@ -10,6 +10,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
 )
 from flask_login import login_user
 from six import string_types
@@ -21,6 +22,7 @@ from .forms import (
     ForgotPasswordForm,
     LoginForm,
     RegistrationForm,
+    ResendVerificationForm,
 )
 from .models import User
 
@@ -54,6 +56,11 @@ def register():
             # Create the user account on Stormpath.  If this fails, an
             # exception will be raised.
             account = User.create(**data)
+            if account.is_unverified():
+                # Don't log in if the account has not been verified yet.
+                return redirect(
+                    current_app.config['STORMPATH_WELCOME_URL']
+                )
 
             # If we're able to successfully create the user's account,
             # we'll log the user in (creating a secure session using
@@ -62,7 +69,7 @@ def register():
             login_user(account, remember=True)
 
             # The email address must be verified, so pop an alert about it.
-            if current_app.config['STORMPATH_VERIFY_EMAIL'] is True:
+            if account.is_unverified() and current_app.config['STORMPATH_VERIFY_EMAIL'] is True:
                 flash('You must validate your email address before logging in. Please check your email for instructions.')
 
             if 'STORMPATH_REGISTRATION_REDIRECT_URL' in current_app.config:
@@ -108,6 +115,25 @@ def login():
             login_user(account, remember=True)
 
             return redirect(request.args.get('next') or current_app.config['STORMPATH_REDIRECT_URL'])
+
+        except StormpathError as err:
+            if err.code == 7102:
+                # User's email has not been verified yet
+                session['verify_email_for'] = form.login.data
+
+                return redirect(
+                    current_app.config['STORMPATH_VERIFY_EMAIL_URL']
+                )
+            else:
+                flash(err.message)
+
+    # Pre-fill fields with the username, if it is available.
+    href = request.args.get('href')
+    if href:
+        try:
+            account = current_app.stormpath_manager.client.accounts.get(href)
+            form.login.data = account.username
+
         except StormpathError as err:
             flash(err.message)
 
@@ -387,3 +413,40 @@ def logout():
    """
     logout_user()
     return redirect('/')
+
+
+def welcome():
+    return render_template(current_app.config['STORMPATH_WELCOME_TEMPLATE'])
+
+
+def verify_email():
+    form = ResendVerificationForm()
+
+    if form.validate_on_submit():
+        try:
+            account = current_app.stormpath_manager.application.accounts.search({'username': form.username.data})[0]
+            current_app.stormpath_manager.application.verification_emails.resend(account, account.directory)
+
+            return render_template(
+                current_app.config['STORMPATH_VERIFY_EMAIL_SENT_TEMPLATE']
+            )
+        except StormpathError as err:
+            flash(err.message)
+
+    form.username.data = session['verify_email_for']
+    return render_template(
+        current_app.config['STORMPATH_VERIFY_EMAIL_TEMPLATE'],
+        form=form
+    )
+
+
+def verify_email_tokens():
+    try:
+        account = current_app.stormpath_manager.client.accounts.verify_email_token(request.args.get('sptoken'))
+
+        return render_template(
+            current_app.config['STORMPATH_VERIFY_EMAIL_COMPLETE_TEMPLATE'], href=account.href
+        )
+
+    except StormpathError as err:
+        flash(err.message)

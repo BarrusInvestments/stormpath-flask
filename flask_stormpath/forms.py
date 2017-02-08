@@ -3,7 +3,7 @@
 
 from flask_wtf import FlaskForm
 from flask_wtf.form import _Auto
-from wtforms.fields import PasswordField, StringField
+from wtforms.fields import HiddenField, PasswordField, StringField
 from wtforms.validators import Email, EqualTo, InputRequired, ValidationError
 
 
@@ -97,3 +97,7 @@ class ChangePasswordForm(FlaskForm):
         InputRequired('Please verify the password.'),
         EqualTo('password', 'Passwords do not match.')
     ])
+
+
+class ResendVerificationForm(FlaskForm):
+    username = HiddenField('Username')
