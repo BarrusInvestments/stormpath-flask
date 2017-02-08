@@ -303,7 +303,6 @@ class TestLogin(StormpathTestCase):
                 password = 'woot1LoveCookies!',
             )
 
-
         with self.app.test_client() as c:
             # Attempt a login using username and password.
             resp = c.post(

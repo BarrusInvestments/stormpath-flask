@@ -443,10 +443,8 @@ def verify_email():
 def verify_email_tokens():
     try:
         account = current_app.stormpath_manager.client.accounts.verify_email_token(request.args.get('sptoken'))
-
         return render_template(
             current_app.config['STORMPATH_VERIFY_EMAIL_COMPLETE_TEMPLATE'], href=account.href
         )
-
     except StormpathError as err:
         flash(err.message)
