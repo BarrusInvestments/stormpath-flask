@@ -436,6 +436,7 @@ def verify_email():
             )
         except StormpathError as err:
             flash(err.message)
+            abort(400)
 
     form.username.data = session['verify_email_for']
     return render_template(
@@ -452,3 +453,4 @@ def verify_email_tokens():
         )
     except StormpathError as err:
         flash(err.message)
+        abort(400)
